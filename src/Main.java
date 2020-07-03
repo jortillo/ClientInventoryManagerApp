@@ -8,6 +8,7 @@ public class Main {
             @Override
             public void run() {
                 Starter starter = new Starter();
+                //starter.setVisible(true);
             }
         });
     }
