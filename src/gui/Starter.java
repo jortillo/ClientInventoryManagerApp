@@ -50,7 +50,7 @@ public class Starter extends JFrame{
                 System.out.println(ex.getMessage());
             }
         }
-        comboBox.addActionListener(action1);
+        comboBox.addActionListener(updateTable);
         mainPanel.setBackground(Color.white);
 
         table.setPreferredScrollableViewportSize(new Dimension(500, 70));
@@ -67,6 +67,8 @@ public class Starter extends JFrame{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+
+    //Update JTable upon selecting JComboBox
     private void SelectComboBox(){
         try{
             conn = DriverManager.getConnection(dbURL);
@@ -110,7 +112,7 @@ public class Starter extends JFrame{
             }
         }
     }
-    ActionListener action1 = new ActionListener() {
+    ActionListener updateTable = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
             SelectComboBox();
