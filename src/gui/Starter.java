@@ -10,14 +10,18 @@ public class Starter extends JFrame{
     JFrame frame = new JFrame();
     private static JComboBox comboBox = new JComboBox();
     private static JTable table = new JTable();
+    private static JButton addButton = new JButton("Add Data");
+    //connection to SQLite DB using JDBC
     private static Connection conn = null;
     public static String dbURL = "jdbc:sqlite:src/database/Client_Inventory_DB.db";
     public Starter(){
         frame.setTitle("Client Inventory Manager");
         frame.setSize(900,700);
         frame.setLayout(new BorderLayout());
-        mainPanel.setLayout(new FlowLayout(FlowLayout.CENTER    ));
+        mainPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         mainPanel.add(comboBox);
+        mainPanel.add(addButton);
+
 
 //Use JDBC to get table/view names from SQLite DB and add to JCombobox
         try{
@@ -50,6 +54,7 @@ public class Starter extends JFrame{
                 System.out.println(ex.getMessage());
             }
         }
+        addButton.addActionListener(action1);
         comboBox.addActionListener(updateTable);
         mainPanel.setBackground(Color.white);
 
@@ -112,10 +117,164 @@ public class Starter extends JFrame{
             }
         }
     }
+
+    //Add data to DB Window
+    private void addFrame(){
+        EventQueue.invokeLater(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                JFrame addFrame = new JFrame();
+                JPanel topPanel = new JPanel();
+                JPanel addPanel = new JPanel();
+                JPanel cards = new JPanel(new CardLayout());;
+                JPanel card1 = new JPanel(new FlowLayout());
+                JPanel card2 = new JPanel(new FlowLayout());
+                JPanel card3 = new JPanel(new FlowLayout());
+
+                JComboBox comboBox2 = new JComboBox();
+                JButton addToTableButton = new JButton("Add to Database");
+                addFrame.setTitle("Add Data");
+                addFrame.setSize(900,300);
+                addFrame.setLayout(new BorderLayout());
+
+                int size = comboBox.getItemCount();
+
+                for(int i = 0; i < size; i++) {
+                    String item = (String) comboBox.getItemAt(i);
+                    System.out.println(item);
+                    comboBox2.addItem(item);
+                }
+
+
+
+                cards.add(card1, "CLIENT");
+                cards.add(card2, "COMMISSION");
+                cards.add(card3, "PRODUCT");
+
+                //CLIENT PANEL
+                int textfieldSize = 10;
+                JLabel clientName = new JLabel("Name");
+                JTextField NAME = new JTextField();
+                JLabel clientStreet = new JLabel("Street");
+                JTextField Street = new JTextField();
+                JLabel clientCity = new JLabel("City");
+                JTextField City = new JTextField();
+                JLabel clientZip = new JLabel("Zip");
+                JTextField Zip = new JTextField();
+                JLabel clientContact = new JLabel("Contact");
+                JTextField Contact_Info = new JTextField();
+
+                NAME.setColumns(textfieldSize);
+                Street.setColumns(textfieldSize);
+                City.setColumns(textfieldSize);
+                Zip.setColumns(textfieldSize);
+                Contact_Info.setColumns(textfieldSize);
+
+                card1.add(clientName);
+                card1.add(Street);
+                card1.add(clientStreet);
+                card1.add(Street);
+                card1.add(clientCity);
+                card1.add(City);
+                card1.add(clientZip);
+                card1.add(Zip);
+                card1.add(clientContact);
+                card1.add(Contact_Info);
+
+                JLabel orderDateLabel = new JLabel("Order Date");
+                JTextField Order_Date = new JTextField();
+                JLabel OrderStatusLabel = new JLabel("Order Status");
+                JTextField Order_Status = new JTextField();
+                JLabel paymentStatusLabel = new JLabel("Payment Status");
+                JTextField Payment_Status = new JTextField();
+                JLabel etcLabel = new JLabel("Estimated Time of Completion");
+                JTextField ETC = new JTextField();
+
+                Order_Date.setColumns(textfieldSize);
+                Order_Status.setColumns(textfieldSize);
+                Payment_Status.setColumns(textfieldSize);
+                ETC.setColumns(textfieldSize);
+
+
+
+                card2.add(orderDateLabel);
+                card2.add(Order_Date);
+                card2.add(OrderStatusLabel);
+                card2.add(Order_Status);
+                card2.add(paymentStatusLabel);
+                card2.add(Payment_Status);
+                card2.add(etcLabel);
+                card2.add(ETC);
+
+                JLabel descLabel = new JLabel("Description");
+                JTextField Description = new JTextField();
+                JLabel priceLabel = new JLabel("Price");
+                JTextField Price = new JTextField();
+                JLabel quantityLabel = new JLabel("Quantity");
+                JTextField Quantity = new JTextField();
+
+                Description.setColumns(50);
+                Price.setColumns(textfieldSize);
+                Quantity.setColumns(textfieldSize);
+
+                card3.add(descLabel);
+                card3.add(Description);
+                card3.add(priceLabel);
+                card3.add(Price);
+                card3.add(quantityLabel);
+                card3.add(Quantity);
+
+                ActionListener rePaint = new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        System.out.println("action");
+                        CardLayout cl = (CardLayout) cards.getLayout();
+                        if(comboBox2.getSelectedItem().equals("COMMISSION")) {
+                            cl.show(cards, "COMMISSION");
+                        }
+                        else if(comboBox2.getSelectedItem().equals("CLIENT")){
+                            cl.show(cards, "CLIENT");
+                        }
+                        else if(comboBox2.getSelectedItem().equals("PRODUCT")){
+                            cl.show(cards, "PRODUCT");
+                        }
+                    }
+                };
+
+                addPanel.add(cards);
+                comboBox2.addActionListener(rePaint);
+                topPanel.add(addToTableButton);
+                topPanel.add((comboBox2));
+                addFrame.add(topPanel, BorderLayout.NORTH);
+                addFrame.add(addPanel, BorderLayout.CENTER);
+
+                addFrame.setVisible(true);
+            }
+        });
+    }
+
+
+    ActionListener rePaint = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            SelectComboBox();
+        }
+    };
+
+
+
     ActionListener updateTable = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
             SelectComboBox();
+        }
+    };
+    ActionListener action1 = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            addFrame();
         }
     };
 }
