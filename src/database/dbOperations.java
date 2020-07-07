@@ -64,6 +64,33 @@ public class dbOperations {
         return (int) key;
     }
 
+    public static int getID(String tableName, String i, String condition, String column) {
+        int id = 0;
+        try {
+            conn = DriverManager.getConnection(dbURL);
+            System.out.println("Connection to SQLite has been established");
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT " + i + " FROM " + tableName + " WHERE " +column +" LIKE " + "'" +condition +"';");
+            while (rs.next()) {
+                id = rs.getInt(i);
+            }
+
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+            return id;
+        }
+    }
+
     // Send a query and return a ResultSet
     public static ResultSet queryReturnResult(String query) {
         ResultSet result = null;

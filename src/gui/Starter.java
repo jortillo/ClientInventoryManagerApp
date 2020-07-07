@@ -130,7 +130,7 @@ public class Starter extends JFrame{
                 JPanel addPanel = new JPanel();
                 JPanel cards = new JPanel(new CardLayout());;
                 JPanel card1 = new JPanel(new FlowLayout());
-                JPanel card2 = new JPanel(new FlowLayout());
+                JPanel card2 = new JPanel(new BorderLayout());
                 JPanel card3 = new JPanel(new FlowLayout());
 
                 JComboBox comboBox2 = new JComboBox();
@@ -146,7 +146,6 @@ public class Starter extends JFrame{
                     System.out.println(item);
                     comboBox2.addItem(item);
                 }
-
 
 
                 cards.add(card1, "CLIENT");
@@ -184,8 +183,62 @@ public class Starter extends JFrame{
                 card1.add(clientContact);
                 card1.add(Contact_Info);
 
+                JComboBox clientBox = new JComboBox();
+                try{
+                    conn = DriverManager.getConnection(dbURL);
+                    System.out.println("Connection to SQLite has been established");
+
+                    Statement stmt = conn.createStatement();
+                    ResultSet rs = stmt.executeQuery("SELECT * FROM CLIENT");
+
+                    while (rs.next()) {
+                        String client = rs.getString("NAME");
+                        System.out.println(client + " added to combo box");
+                        clientBox.addItem(client);
+
+                    }
+                    clientBox.updateUI();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }finally {
+                    try {
+                        if (conn != null){
+                            conn.close();
+                        }
+                    } catch(SQLException ex){
+                        System.out.println(ex.getMessage());
+                    }
+                }
+                JComboBox productBox = new JComboBox();
+                try{
+                    conn = DriverManager.getConnection(dbURL);
+                    System.out.println("Connection to SQLite has been established");
+
+                    Statement stmt = conn.createStatement();
+                    ResultSet rs = stmt.executeQuery("SELECT * FROM PRODUCT");
+
+                    while (rs.next()) {
+                        String description = rs.getString("DESCRIPTION");
+                            System.out.println(description + " added to combo box");
+                            productBox.addItem(description);
+
+                    }
+                    productBox.updateUI();
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }finally {
+                    try {
+                        if (conn != null){
+                            conn.close();
+                        }
+                    } catch(SQLException ex){
+                        System.out.println(ex.getMessage());
+                    }
+                }
+                JLabel clientLabel = new JLabel("Client");
+                JLabel productLabel = new JLabel("Product");
                 JLabel orderDateLabel = new JLabel("Order Date");
-                JTextField Order_Date = new JTextField();
+                JTextField Order_Date = new JTextField("yyyy-dd-mm");
                 JLabel OrderStatusLabel = new JLabel("Order Status");
                 JTextField Order_Status = new JTextField();
                 JLabel paymentStatusLabel = new JLabel("Payment Status");
@@ -198,14 +251,23 @@ public class Starter extends JFrame{
                 Payment_Status.setColumns(textfieldSize);
                 ETC.setColumns(textfieldSize);
 
-                card2.add(orderDateLabel);
-                card2.add(Order_Date);
-                card2.add(OrderStatusLabel);
-                card2.add(Order_Status);
-                card2.add(paymentStatusLabel);
-                card2.add(Payment_Status);
-                card2.add(etcLabel);
-                card2.add(ETC);
+                JPanel topCard2 = new JPanel(new FlowLayout());
+                topCard2.add(clientLabel);
+                topCard2.add(clientBox);
+                topCard2.add(productLabel);
+                topCard2.add(productBox);
+                JPanel centerCard2 = new JPanel(new FlowLayout());
+                centerCard2.add(orderDateLabel);
+                centerCard2.add(Order_Date);
+                centerCard2.add(OrderStatusLabel);
+                centerCard2.add(Order_Status);
+                centerCard2.add(paymentStatusLabel);
+                centerCard2.add(Payment_Status);
+                centerCard2.add(etcLabel);
+                centerCard2.add(ETC);
+                card2.add(topCard2, BorderLayout.NORTH);
+                card2.add(centerCard2, BorderLayout.CENTER);
+
 
                 JLabel descLabel = new JLabel("Description");
                 JTextField Description = new JTextField();
@@ -247,7 +309,10 @@ public class Starter extends JFrame{
                     public void actionPerformed(ActionEvent e) {
                         System.out.println("Send Query");
                         if(comboBox2.getSelectedItem().equals("COMMISSION")) {
-
+                            int pid = dbOperations.getID("PRODUCT","PID", (String) productBox.getSelectedItem(), "DESCRIPTION");
+                            int id = dbOperations.getID("CLIENT","ID", (String) clientBox.getSelectedItem(), "NAME");
+                            dbOperations.sendQuery("INSERT INTO COMMISSION VALUES" +
+                                    "("+id +"," +pid+","+"'"+Order_Date.getText()+"',"+"'"+Order_Status.getText()+"','"+Payment_Status.getText()+"','"+ETC.getText()+"');");
                         }
                         else if(comboBox2.getSelectedItem().equals("CLIENT")){
                             dbOperations.sendQuery("INSERT INTO CLIENT VALUES(NULL," + "'" + NAME.getText() +"'"+ "," +
@@ -261,7 +326,9 @@ public class Starter extends JFrame{
                             dbOperations.closeConnection();
                         }
                         else if(comboBox2.getSelectedItem().equals("PRODUCT")){
-
+                            dbOperations.sendQuery("INSERT INTO PRODUCT VALUES(NULL," + "'" + Description.getText() +"'"+ "," +
+                                    "'" + Price.getText() + "'" + "," + "'" + Quantity.getText() +"'" + ");");
+                            dbOperations.closeConnection();
                         }
                     }
                 };
