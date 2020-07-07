@@ -330,6 +330,7 @@ public class Starter extends JFrame{
                                     "'" + Price.getText() + "'" + "," + "'" + Quantity.getText() +"'" + ");");
                             dbOperations.closeConnection();
                         }
+                        addFrame.dispose();
                     }
                 };
 
