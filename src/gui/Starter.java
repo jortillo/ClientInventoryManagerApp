@@ -1,6 +1,7 @@
 package gui;
 
 import database.*;
+
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
@@ -9,26 +10,29 @@ import java.sql.*;
 
 import static java.sql.Types.NULL;
 
-public class Starter extends JFrame{
+public class Starter extends JFrame {
     JPanel mainPanel = new JPanel();
     JFrame frame = new JFrame();
     private static JComboBox comboBox = new JComboBox();
     private static JTable table = new JTable();
     private static JButton addButton = new JButton("Add Data");
+    private static JButton deleteButton = new JButton("Delete");
     //connection to SQLite DB using JDBC
     private static Connection conn = null;
     public static String dbURL = "jdbc:sqlite:src/database/Client_Inventory_DB.db";
-    public Starter(){
+
+    public Starter() {
         frame.setTitle("Client Inventory Manager");
-        frame.setSize(900,700);
+        frame.setSize(900, 700);
         frame.setLayout(new BorderLayout());
         mainPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         mainPanel.add(comboBox);
         mainPanel.add(addButton);
+        mainPanel.add(deleteButton);
 
 
 //Use JDBC to get table/view names from SQLite DB and add to JCombobox
-        try{
+        try {
             conn = DriverManager.getConnection(dbURL);
             System.out.println("Connection to SQLite has been established");
             ResultSet rs = null;
@@ -37,7 +41,7 @@ public class Starter extends JFrame{
 
             while (rs.next()) {
                 String tableName = rs.getString("TABLE_NAME");
-                if(!tableName.equals("CLIENT_CONTACTS")) {
+                if (!tableName.equals("CLIENT_CONTACTS")) {
                     System.out.println(tableName + " added to combo box");
                     comboBox.addItem(tableName);
                 }
@@ -45,17 +49,18 @@ public class Starter extends JFrame{
             comboBox.updateUI();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        }finally {
+        } finally {
             try {
-                if (conn != null){
+                if (conn != null) {
                     conn.close();
                 }
-            } catch(SQLException ex){
+            } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
         }
         addButton.addActionListener(action1);
         comboBox.addActionListener(updateTable);
+        deleteButton.addActionListener(deleteData);
         mainPanel.setBackground(Color.white);
 
         table.setPreferredScrollableViewportSize(new Dimension(500, 70));
@@ -63,8 +68,8 @@ public class Starter extends JFrame{
 
 
         JScrollPane scrollPane = new JScrollPane(table);
-        mainPanel.add(comboBox , BorderLayout.CENTER);
-        frame.add(mainPanel,BorderLayout.NORTH);
+        mainPanel.add(comboBox, BorderLayout.CENTER);
+        frame.add(mainPanel, BorderLayout.NORTH);
         frame.add(scrollPane, BorderLayout.CENTER);
 
         frame.add(mainPanel, BorderLayout.NORTH);
@@ -74,12 +79,12 @@ public class Starter extends JFrame{
 
 
     //Update JTable upon selecting JComboBox
-    private void SelectComboBox(){
-        try{
+    private void SelectComboBox() {
+        try {
             conn = DriverManager.getConnection(dbURL);
             System.out.println("Connection to SQLite has been established");
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM [" + comboBox.getSelectedItem() +"_VIEW" +"];");
+            ResultSet rs = stmt.executeQuery("SELECT * FROM [" + comboBox.getSelectedItem() + "_VIEW" + "];");
 
             //get column info
             ResultSetMetaData rsmd = rs.getMetaData();
@@ -87,7 +92,7 @@ public class Starter extends JFrame{
 
             DefaultTableModel tm = (DefaultTableModel) table.getModel();
             tm.setColumnCount(0);
-            for (int i = 1; i <= columnCount; i++ ) {
+            for (int i = 1; i <= columnCount; i++) {
                 tm.addColumn(rsmd.getColumnName(i));
             }
 
@@ -97,8 +102,8 @@ public class Starter extends JFrame{
             // add rows to table
             while (rs.next()) {
                 String[] a = new String[columnCount];
-                for(int i = 0; i < columnCount; i++) {
-                    a[i] = rs.getString(i+1);
+                for (int i = 0; i < columnCount; i++) {
+                    a[i] = rs.getString(i + 1);
                 }
                 tm.addRow(a);
             }
@@ -109,26 +114,25 @@ public class Starter extends JFrame{
             System.out.println(e.getMessage());
         } finally {
             try {
-                if (conn != null){
+                if (conn != null) {
                     conn.close();
                 }
-            } catch(SQLException ex){
+            } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
         }
     }
 
     //Create new window
-    private void addFrame(){
-        EventQueue.invokeLater(new Runnable()
-        {
+    private void addFrame() {
+        EventQueue.invokeLater(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 JFrame addFrame = new JFrame();
                 JPanel topPanel = new JPanel();
                 JPanel addPanel = new JPanel();
-                JPanel cards = new JPanel(new CardLayout());;
+                JPanel cards = new JPanel(new CardLayout());
+                ;
                 JPanel card1 = new JPanel(new FlowLayout());
                 JPanel card2 = new JPanel(new BorderLayout());
                 JPanel card3 = new JPanel(new FlowLayout());
@@ -136,12 +140,12 @@ public class Starter extends JFrame{
                 JComboBox comboBox2 = new JComboBox();
                 JButton addToTableButton = new JButton("Add to Database");
                 addFrame.setTitle("Add Data");
-                addFrame.setSize(900,300);
+                addFrame.setSize(900, 300);
                 addFrame.setLayout(new BorderLayout());
 
                 int size = comboBox.getItemCount();
 
-                for(int i = 0; i < size; i++) {
+                for (int i = 0; i < size; i++) {
                     String item = (String) comboBox.getItemAt(i);
                     System.out.println(item);
                     comboBox2.addItem(item);
@@ -184,7 +188,7 @@ public class Starter extends JFrame{
                 card1.add(Contact_Info);
 
                 JComboBox clientBox = new JComboBox();
-                try{
+                try {
                     conn = DriverManager.getConnection(dbURL);
                     System.out.println("Connection to SQLite has been established");
 
@@ -200,17 +204,17 @@ public class Starter extends JFrame{
                     clientBox.updateUI();
                 } catch (SQLException e) {
                     System.out.println(e.getMessage());
-                }finally {
+                } finally {
                     try {
-                        if (conn != null){
+                        if (conn != null) {
                             conn.close();
                         }
-                    } catch(SQLException ex){
+                    } catch (SQLException ex) {
                         System.out.println(ex.getMessage());
                     }
                 }
                 JComboBox productBox = new JComboBox();
-                try{
+                try {
                     conn = DriverManager.getConnection(dbURL);
                     System.out.println("Connection to SQLite has been established");
 
@@ -219,19 +223,19 @@ public class Starter extends JFrame{
 
                     while (rs.next()) {
                         String description = rs.getString("DESCRIPTION");
-                            System.out.println(description + " added to combo box");
-                            productBox.addItem(description);
+                        System.out.println(description + " added to combo box");
+                        productBox.addItem(description);
 
                     }
                     productBox.updateUI();
                 } catch (SQLException e) {
                     System.out.println(e.getMessage());
-                }finally {
+                } finally {
                     try {
-                        if (conn != null){
+                        if (conn != null) {
                             conn.close();
                         }
-                    } catch(SQLException ex){
+                    } catch (SQLException ex) {
                         System.out.println(ex.getMessage());
                     }
                 }
@@ -292,13 +296,11 @@ public class Starter extends JFrame{
                     public void actionPerformed(ActionEvent e) {
                         System.out.println("action");
                         CardLayout cl = (CardLayout) cards.getLayout();
-                        if(comboBox2.getSelectedItem().equals("COMMISSION")) {
+                        if (comboBox2.getSelectedItem().equals("COMMISSION")) {
                             cl.show(cards, "COMMISSION");
-                        }
-                        else if(comboBox2.getSelectedItem().equals("CLIENT")){
+                        } else if (comboBox2.getSelectedItem().equals("CLIENT")) {
                             cl.show(cards, "CLIENT");
-                        }
-                        else if(comboBox2.getSelectedItem().equals("PRODUCT")){
+                        } else if (comboBox2.getSelectedItem().equals("PRODUCT")) {
                             cl.show(cards, "PRODUCT");
                         }
                     }
@@ -308,26 +310,24 @@ public class Starter extends JFrame{
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         System.out.println("Send Query");
-                        if(comboBox2.getSelectedItem().equals("COMMISSION")) {
-                            int pid = dbOperations.getID("PRODUCT","PID", (String) productBox.getSelectedItem(), "DESCRIPTION");
-                            int id = dbOperations.getID("CLIENT","ID", (String) clientBox.getSelectedItem(), "NAME");
+                        if (comboBox2.getSelectedItem().equals("COMMISSION")) {
+                            int pid = dbOperations.getID("PRODUCT", "PID", (String) productBox.getSelectedItem(), "DESCRIPTION");
+                            int id = dbOperations.getID("CLIENT", "ID", (String) clientBox.getSelectedItem(), "NAME");
                             dbOperations.sendQuery("INSERT INTO COMMISSION VALUES" +
-                                    "("+id +"," +pid+","+"'"+Order_Date.getText()+"',"+"'"+Order_Status.getText()+"','"+Payment_Status.getText()+"','"+ETC.getText()+"');");
-                        }
-                        else if(comboBox2.getSelectedItem().equals("CLIENT")){
-                            dbOperations.sendQuery("INSERT INTO CLIENT VALUES(NULL," + "'" + NAME.getText() +"'"+ "," +
-                                   "'" + Street.getText() + "'" + "," + "'" + City.getText() +"'" + "," + "'"
-                                    + Zip.getText() +"'" + ");");
+                                    "(" + id + "," + pid + "," + "'" + Order_Date.getText() + "'," + "'" + Order_Status.getText() + "','" + Payment_Status.getText() + "','" + ETC.getText() + "');");
+                        } else if (comboBox2.getSelectedItem().equals("CLIENT")) {
+                            dbOperations.sendQuery("INSERT INTO CLIENT VALUES(NULL," + "'" + NAME.getText() + "'" + "," +
+                                    "'" + Street.getText() + "'" + "," + "'" + City.getText() + "'" + "," + "'"
+                                    + Zip.getText() + "'" + ");");
 
                             int id = dbOperations.getlastID("CLIENT");
                             dbOperations.closeConnection();
                             System.out.println("Insert Into Client");
-                            dbOperations.sendQuery("INSERT INTO CLIENT_CONTACTS VALUES(" + id + ","+"'"+Contact_Info.getText()+"');");
+                            dbOperations.sendQuery("INSERT INTO CLIENT_CONTACTS VALUES(" + id + "," + "'" + Contact_Info.getText() + "');");
                             dbOperations.closeConnection();
-                        }
-                        else if(comboBox2.getSelectedItem().equals("PRODUCT")){
-                            dbOperations.sendQuery("INSERT INTO PRODUCT VALUES(NULL," + "'" + Description.getText() +"'"+ "," +
-                                    "'" + Price.getText() + "'" + "," + "'" + Quantity.getText() +"'" + ");");
+                        } else if (comboBox2.getSelectedItem().equals("PRODUCT")) {
+                            dbOperations.sendQuery("INSERT INTO PRODUCT VALUES(NULL," + "'" + Description.getText() + "'" + "," +
+                                    "'" + Price.getText() + "'" + "," + "'" + Quantity.getText() + "'" + ");");
                             dbOperations.closeConnection();
                         }
                         addFrame.dispose();
@@ -346,6 +346,32 @@ public class Starter extends JFrame{
             }
         });
     }
+
+    public static String deleteDataFromDB() {
+        String s = (String) table.getValueAt(table.getSelectedRow(), 0);
+        System.out.println(s);
+        return s;
+    }
+
+    ActionListener deleteData = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //deleteDataFromDB();
+            String s = "";
+
+            s = (String) table.getValueAt(table.getSelectedRow(), 0);
+            System.out.println(s);
+            if (comboBox.getSelectedItem().equals("CLIENT")) {
+                dbOperations.deleteSelectedRow("ID", (String) comboBox.getSelectedItem(), table.getColumnName(0), s);
+            } else if (comboBox.getSelectedItem().equals("PRODUCT")) {
+                dbOperations.deleteSelectedRow("PID", (String) comboBox.getSelectedItem(), table.getColumnName(0), s);
+            } else if (comboBox.getSelectedItem().equals("COMMISSION")) {
+                dbOperations.deleteCommissionRow("ID", (String) comboBox.getSelectedItem(), table.getColumnName(0), s);
+            }
+            SelectComboBox();
+
+        }
+    };
 
     ActionListener updateTable = new ActionListener() {
         @Override

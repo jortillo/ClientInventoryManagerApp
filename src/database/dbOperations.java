@@ -1,7 +1,9 @@
 package database;
+
 import gui.Starter;
 
 import java.sql.*;
+
 public class dbOperations {
     //connection to SQLite DB using JDBC
     private static Connection conn = null;
@@ -11,28 +13,29 @@ public class dbOperations {
         String sql = "INSERT INTO" + tableName +
                 "VALUES(" + values + ")";
 
-        try{
+        try {
             conn = DriverManager.getConnection(dbURL);
             System.out.println("Connection to SQLite has been established");
         } catch (SQLException e) {
             System.out.println(e.getMessage());
 
-        }finally {
+        } finally {
             try {
-                if (conn != null){
+                if (conn != null) {
                     conn.close();
                 }
-            } catch(SQLException ex){
+            } catch (SQLException ex) {
                 System.out.println(ex.getMessage());
             }
         }
     }
 
-    public static void closeConnection(){
+    public static void closeConnection() {
         try {
             conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        catch (SQLException e) { e.printStackTrace(); }
     }
 
     // Send a query to database
@@ -41,8 +44,9 @@ public class dbOperations {
             conn = DriverManager.getConnection(dbURL);
             conn.createStatement().execute(query);
 
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        catch (SQLException e) { e.printStackTrace(); }
     }
 
     //return last inserted ID
@@ -57,10 +61,10 @@ public class dbOperations {
                 key = rs.getLong(1);
             }
 
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        catch (SQLException e) { e.printStackTrace();
-        }
-        System.out.println("ID: "+key);
+        System.out.println("ID: " + key);
         return (int) key;
     }
 
@@ -71,7 +75,7 @@ public class dbOperations {
             System.out.println("Connection to SQLite has been established");
 
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT " + i + " FROM " + tableName + " WHERE " +column +" LIKE " + "'" +condition +"';");
+            ResultSet rs = stmt.executeQuery("SELECT " + i + " FROM " + tableName + " WHERE " + column + " LIKE " + "'" + condition + "';");
             while (rs.next()) {
                 id = rs.getInt(i);
             }
@@ -91,11 +95,58 @@ public class dbOperations {
         }
     }
 
+    public static void deleteCommissionRow(String ID, String tableName, String column, String condition) {
+        int id = 0;
+        try {
+            conn = DriverManager.getConnection(dbURL);
+            System.out.println("Connection to SQLite has been established");
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT " + ID + " FROM " + "CLIENT" + " WHERE " + column + " LIKE " + "'" + condition + "';");
+            while (rs.next()) {
+                id = rs.getInt(ID);
+            }
+            //conn.createStatement().execute("DELETE FROM "+tableName+" WHERE "+column+" LIKE '"+condition+"';");
+            System.out.println("DELETE FROM " + tableName + " WHERE " + ID + " LIKE '" + id + "';");
+            //conn.createStatement().execute("DELETE FROM "+"COMMISSION"+" WHERE "+ ID +" LIKE '"+id+"';");
+            conn.createStatement().execute("DELETE FROM " + tableName + " WHERE " + ID + " LIKE '" + id + "';");
+
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void deleteSelectedRow(String ID, String tableName, String column, String condition) {
+        int id = 0;
+        try {
+            conn = DriverManager.getConnection(dbURL);
+            System.out.println("Connection to SQLite has been established");
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT " + ID + " FROM " + tableName + " WHERE " + column + " LIKE " + "'" + condition + "';");
+            while (rs.next()) {
+                id = rs.getInt(ID);
+            }
+            //conn.createStatement().execute("DELETE FROM "+tableName+" WHERE "+column+" LIKE '"+condition+"';");
+            System.out.println("DELETE FROM " + tableName + " WHERE " + ID + " LIKE '" + id + "';");
+            //conn.createStatement().execute("DELETE FROM "+"COMMISSION"+" WHERE "+ ID +" LIKE '"+id+"';");
+            conn.createStatement().execute("DELETE FROM " + tableName + " WHERE " + ID + " LIKE '" + id + "';");
+
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     // Send a query and return a ResultSet
     public static ResultSet queryReturnResult(String query) {
         ResultSet result = null;
-        try { result = conn.createStatement().executeQuery(query); }
-        catch (SQLException e) { e.printStackTrace(); }
+        try {
+            result = conn.createStatement().executeQuery(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return result;
     }
 }
