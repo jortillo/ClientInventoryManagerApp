@@ -1,9 +1,13 @@
 package gui;
+
+import database.*;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.event.*;
 import java.sql.*;
+
+import static java.sql.Types.NULL;
 
 public class Starter extends JFrame{
     JPanel mainPanel = new JPanel();
@@ -30,10 +34,6 @@ public class Starter extends JFrame{
             ResultSet rs = null;
             DatabaseMetaData meta = conn.getMetaData();
             rs = meta.getTables(null, null, null, new String[]{"TABLE"});
-
-
-            //System.out.println("Add info added to combo box");
-            //comboBox.addItem("Add info");
 
             while (rs.next()) {
                 String tableName = rs.getString("TABLE_NAME");
@@ -118,7 +118,7 @@ public class Starter extends JFrame{
         }
     }
 
-    //Add data to DB Window
+    //Create new window
     private void addFrame(){
         EventQueue.invokeLater(new Runnable()
         {
@@ -173,6 +173,7 @@ public class Starter extends JFrame{
                 Contact_Info.setColumns(textfieldSize);
 
                 card1.add(clientName);
+                card1.add(NAME);
                 card1.add(Street);
                 card1.add(clientStreet);
                 card1.add(Street);
@@ -196,8 +197,6 @@ public class Starter extends JFrame{
                 Order_Status.setColumns(textfieldSize);
                 Payment_Status.setColumns(textfieldSize);
                 ETC.setColumns(textfieldSize);
-
-
 
                 card2.add(orderDateLabel);
                 card2.add(Order_Date);
@@ -226,7 +225,7 @@ public class Starter extends JFrame{
                 card3.add(quantityLabel);
                 card3.add(Quantity);
 
-                ActionListener rePaint = new ActionListener() {
+                ActionListener changeCard = new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         System.out.println("action");
@@ -243,8 +242,33 @@ public class Starter extends JFrame{
                     }
                 };
 
+                ActionListener addData = new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        System.out.println("Send Query");
+                        if(comboBox2.getSelectedItem().equals("COMMISSION")) {
+
+                        }
+                        else if(comboBox2.getSelectedItem().equals("CLIENT")){
+                            dbOperations.sendQuery("INSERT INTO CLIENT VALUES(NULL," + "'" + NAME.getText() +"'"+ "," +
+                                   "'" + Street.getText() + "'" + "," + "'" + City.getText() +"'" + "," + "'"
+                                    + Zip.getText() +"'" + ");");
+
+                            int id = dbOperations.getlastID("CLIENT");
+                            dbOperations.closeConnection();
+                            System.out.println("Insert Into Client");
+                            dbOperations.sendQuery("INSERT INTO CLIENT_CONTACTS VALUES(" + id + ","+"'"+Contact_Info.getText()+"');");
+                            dbOperations.closeConnection();
+                        }
+                        else if(comboBox2.getSelectedItem().equals("PRODUCT")){
+
+                        }
+                    }
+                };
+
                 addPanel.add(cards);
-                comboBox2.addActionListener(rePaint);
+                addToTableButton.addActionListener(addData);
+                comboBox2.addActionListener(changeCard);
                 topPanel.add(addToTableButton);
                 topPanel.add((comboBox2));
                 addFrame.add(topPanel, BorderLayout.NORTH);
@@ -254,16 +278,6 @@ public class Starter extends JFrame{
             }
         });
     }
-
-
-    ActionListener rePaint = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            SelectComboBox();
-        }
-    };
-
-
 
     ActionListener updateTable = new ActionListener() {
         @Override
