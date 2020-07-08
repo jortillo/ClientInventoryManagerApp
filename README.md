@@ -18,5 +18,5 @@ Java app has functions such as adding data, editing data, and deleting data.
 ![Edit/Delete](/images/EditDelete.gif)
 
 # How to Run
-* Download and extra whole zip folder
+* Download and extract whole zip folder
 * Execute ClientManagerApp.jar through right click and open or through CMD/Terminal (Requires JRE or JVM 8 or higher to run)
