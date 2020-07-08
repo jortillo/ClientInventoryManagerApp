@@ -11,10 +11,10 @@ Java app has functions such as adding data, editing data, and deleting data.
 ## JTables retrieves data from each SQLite Table
 ![JTables](/images/GetTable.gif)
 
-## Users are able to add data to SQLite db. Jtable reflects new changes
+## Users are able to add data to SQLite database. Jtable reflects new changes
 ![Add Data](/images/AddData.gif)
 
-## Users are able to edit and delete data from SQLite and Jtables reflects new changes
+## Users are able to edit and delete data from SQLite database and Jtables reflects new changes
 ![Edit/Delete](/images/EditDelete.gif)
 
 # How to Run
