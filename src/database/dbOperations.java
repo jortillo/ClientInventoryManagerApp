@@ -9,27 +9,7 @@ public class dbOperations {
     private static Connection conn = null;
     public static String dbURL = "jdbc:sqlite:src/database/Client_Inventory_DB.db";
 
-    public void insert(String tableName, String values) {
-        String sql = "INSERT INTO" + tableName +
-                "VALUES(" + values + ")";
-
-        try {
-            conn = DriverManager.getConnection(dbURL);
-            System.out.println("Connection to SQLite has been established");
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-            }
-        }
-    }
-
+    //method to close connection
     public static void closeConnection() {
         try {
             conn.close();
@@ -38,7 +18,7 @@ public class dbOperations {
         }
     }
 
-    // Send a query to database
+    //Send a query to database
     public static void sendQuery(String query) {
         try {
             conn = DriverManager.getConnection(dbURL);
@@ -68,6 +48,7 @@ public class dbOperations {
         return (int) key;
     }
 
+    //return ID of a table
     public static int getID(String tableName, String i, String condition, String column) {
         int id = 0;
         try {
@@ -95,6 +76,7 @@ public class dbOperations {
         }
     }
 
+    //delete row from commission table
     public static void deleteCommissionRow(String ID, String tableName, String column, String condition) {
         int id = 0;
         try {
@@ -106,9 +88,7 @@ public class dbOperations {
             while (rs.next()) {
                 id = rs.getInt(ID);
             }
-            //conn.createStatement().execute("DELETE FROM "+tableName+" WHERE "+column+" LIKE '"+condition+"';");
             System.out.println("DELETE FROM " + tableName + " WHERE " + ID + " LIKE '" + id + "';");
-            //conn.createStatement().execute("DELETE FROM "+"COMMISSION"+" WHERE "+ ID +" LIKE '"+id+"';");
             conn.createStatement().execute("DELETE FROM " + tableName + " WHERE " + ID + " LIKE '" + id + "';");
 
             conn.close();
@@ -117,6 +97,7 @@ public class dbOperations {
         }
     }
 
+    //delete a selected row from table
     public static void deleteSelectedRow(String ID, String tableName, String column, String condition) {
         int id = 0;
         try {
@@ -128,10 +109,30 @@ public class dbOperations {
             while (rs.next()) {
                 id = rs.getInt(ID);
             }
-            //conn.createStatement().execute("DELETE FROM "+tableName+" WHERE "+column+" LIKE '"+condition+"';");
             System.out.println("DELETE FROM " + tableName + " WHERE " + ID + " LIKE '" + id + "';");
-            //conn.createStatement().execute("DELETE FROM "+"COMMISSION"+" WHERE "+ ID +" LIKE '"+id+"';");
             conn.createStatement().execute("DELETE FROM " + tableName + " WHERE " + ID + " LIKE '" + id + "';");
+
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //update value from table
+    public static void updateValue(String ID, String tableName, String column, String condition, String values) {
+        int id = 0;
+        try {
+            conn = DriverManager.getConnection(dbURL);
+            System.out.println("Connection to SQLite has been established");
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT " + ID + " FROM " + tableName + " WHERE " + column + " LIKE " + "'" + condition + "';");
+            while (rs.next()) {
+                id = rs.getInt(ID);
+            }
+
+            System.out.println("UPDATE " + tableName + " SET " + column + " = '" + values + "' WHERE " + ID + " LIKE '" + id + "';");
+            conn.createStatement().execute("UPDATE " + tableName + " SET " + column + " = '" + values + "' WHERE " + ID + " LIKE '" + id + "';");
 
             conn.close();
         } catch (SQLException e) {

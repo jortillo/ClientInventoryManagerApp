@@ -54,14 +54,14 @@ SELECT PRODUCT.Description, PRODUCT.Price, PRODUCT.Quantity
 FROM PRODUCT;
 
 INSERT INTO CLIENT
-VALUES(1, "John Doe", "1111", "A St", 12345);
+VALUES(1, "John Doe", "1111 A St", "San Diego", 12345);
 
 
 INSERT INTO CLIENT
-VALUES(2, "Dave Lee", "2222", "B St", 54321);
+VALUES(2, "Dave Lee", "2222 B St", "San Jose", 54321);
 
 INSERT INTO CLIENT
-VALUES(3, "Joe Moe", "3333", "C St", 14231);
+VALUES(3, "Joe Moe", "3333 C St", "Sacramento", 14231);
 
 
 INSERT INTO CLIENT_CONTACTS

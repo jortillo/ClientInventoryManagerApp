@@ -4,17 +4,18 @@ import database.*;
 
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.*;
 import java.awt.event.*;
 import java.sql.*;
-
-import static java.sql.Types.NULL;
 
 public class Starter extends JFrame {
     JPanel mainPanel = new JPanel();
     JFrame frame = new JFrame();
     private static JComboBox comboBox = new JComboBox();
     private static JTable table = new JTable();
+    DefaultTableModel tm = (DefaultTableModel) table.getModel();
     private static JButton addButton = new JButton("Add Data");
     private static JButton deleteButton = new JButton("Delete");
     //connection to SQLite DB using JDBC
@@ -58,15 +59,62 @@ public class Starter extends JFrame {
                 System.out.println(ex.getMessage());
             }
         }
+
         addButton.addActionListener(action1);
         comboBox.addActionListener(updateTable);
         deleteButton.addActionListener(deleteData);
         mainPanel.setBackground(Color.white);
 
+
         table.setPreferredScrollableViewportSize(new Dimension(500, 70));
         table.setFillsViewportHeight(true);
 
+        //action listener for Jtable
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                int row = table.rowAtPoint(evt.getPoint());
+                int col = table.columnAtPoint(evt.getPoint());
 
+                if (row >= 0 && col >= 0) {
+                    String old_value = "";
+                    old_value = (String) table.getValueAt(table.getSelectedRow(), table.getSelectedColumn());
+                    String finalOld_value = old_value;
+                    tm.addTableModelListener(new TableModelListener() {
+                        //update values in db when jtable is edited
+                        @Override
+                        public void tableChanged(TableModelEvent tableModelEvent) {
+                            String value = "";
+                            if (table.isEditing()) {
+                                value = (String) table.getValueAt(table.getSelectedRow(), table.getSelectedColumn());
+                            }
+                            System.out.println("Old Value: " + finalOld_value);
+                            System.out.println("Value: " + value);
+                            if (comboBox.getSelectedItem().equals("CLIENT")) {
+                                dbOperations.updateValue("ID", "CLIENT", table.getColumnName(table.getSelectedColumn()), finalOld_value, value);
+                            } else if (comboBox.getSelectedItem().equals("PRODUCT")) {
+                                dbOperations.updateValue("PID", "PRODUCT", table.getColumnName(table.getSelectedColumn()), finalOld_value, value);
+                            } else if (comboBox.getSelectedItem().equals("COMMISSION")) {
+                                switch (table.getColumnName(table.getSelectedColumn())) {
+                                    case "NAME":
+                                        System.out.println("Name");
+                                        dbOperations.updateValue("ID", "CLIENT", "Name", finalOld_value, value);
+                                        break;
+                                    case "Commissioned Product":
+                                        dbOperations.updateValue("PID", "PRODUCT", "Description", finalOld_value, value);
+                                        break;
+                                    case "Price":
+                                        dbOperations.updateValue("PID", "PRODUCT", "Price", finalOld_value, value);
+                                        break;
+                                    default:
+                                        dbOperations.updateValue("ID", "COMMISSION", table.getColumnName(table.getSelectedColumn()), finalOld_value, value);
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        });
         JScrollPane scrollPane = new JScrollPane(table);
         mainPanel.add(comboBox, BorderLayout.CENTER);
         frame.add(mainPanel, BorderLayout.NORTH);
@@ -76,7 +124,6 @@ public class Starter extends JFrame {
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
-
 
     //Update JTable upon selecting JComboBox
     private void SelectComboBox() {
@@ -90,8 +137,9 @@ public class Starter extends JFrame {
             ResultSetMetaData rsmd = rs.getMetaData();
             int columnCount = rsmd.getColumnCount();
 
-            DefaultTableModel tm = (DefaultTableModel) table.getModel();
+
             tm.setColumnCount(0);
+
             for (int i = 1; i <= columnCount; i++) {
                 tm.addColumn(rsmd.getColumnName(i));
             }
@@ -123,7 +171,7 @@ public class Starter extends JFrame {
         }
     }
 
-    //Create new window
+    //Create new window for add button
     private void addFrame() {
         EventQueue.invokeLater(new Runnable() {
             @Override
@@ -150,7 +198,6 @@ public class Starter extends JFrame {
                     System.out.println(item);
                     comboBox2.addItem(item);
                 }
-
 
                 cards.add(card1, "CLIENT");
                 cards.add(card2, "COMMISSION");
@@ -291,6 +338,7 @@ public class Starter extends JFrame {
                 card3.add(quantityLabel);
                 card3.add(Quantity);
 
+                //change cards of jframe
                 ActionListener changeCard = new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -306,6 +354,7 @@ public class Starter extends JFrame {
                     }
                 };
 
+                //add data to db
                 ActionListener addData = new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -330,6 +379,7 @@ public class Starter extends JFrame {
                                     "'" + Price.getText() + "'" + "," + "'" + Quantity.getText() + "'" + ");");
                             dbOperations.closeConnection();
                         }
+                        SelectComboBox();
                         addFrame.dispose();
                     }
                 };
@@ -347,16 +397,11 @@ public class Starter extends JFrame {
         });
     }
 
-    public static String deleteDataFromDB() {
-        String s = (String) table.getValueAt(table.getSelectedRow(), 0);
-        System.out.println(s);
-        return s;
-    }
+    //ACTION LISTENERS
 
     ActionListener deleteData = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            //deleteDataFromDB();
             String s = "";
 
             s = (String) table.getValueAt(table.getSelectedRow(), 0);
