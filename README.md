@@ -1,7 +1,10 @@
 # ClientInventoryManagerApp
 This is a Java app that contains a user's clients/customers and products/inventory. 
+
 This app is connected to a sqlite database, for Jtables to retrieve data from and display them.
+
 Java app connects to SQLite database using JDBC.
+
 Java app has functions such as adding data, editing data, and deleting data. 
 
 
